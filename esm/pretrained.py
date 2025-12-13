@@ -23,13 +23,16 @@ from esm.utils.constants.models import (
 ModelBuilder = Callable[[torch.device | str], nn.Module]
 
 
+WEIGHTS_DIR = Path(__file__).resolve().parent / "data/weights"
+
+
 def ESM3_structure_encoder_v0(device: torch.device | str = "cpu"):
     with torch.device(device):
         model = StructureTokenEncoder(
             d_model=1024, n_heads=1, v_heads=128, n_layers=2, d_out=128, n_codes=4096
         ).eval()
     state_dict = torch.load(
-        data_root("esm3") / "data/weights/esm3_structure_encoder_v0.pth",
+        WEIGHTS_DIR / "esm3_structure_encoder_v0.pth",
         map_location=device,
     )
     model.load_state_dict(state_dict)
@@ -40,7 +43,7 @@ def ESM3_structure_decoder_v0(device: torch.device | str = "cpu"):
     with torch.device(device):
         model = StructureTokenDecoder(d_model=1280, n_heads=20, n_layers=30).eval()
     state_dict = torch.load(
-        data_root("esm3") / "data/weights/esm3_structure_decoder_v0.pth",
+        WEIGHTS_DIR / "esm3_structure_decoder_v0.pth",
         map_location=device,
     )
     model.load_state_dict(state_dict)
@@ -51,7 +54,7 @@ def ESM3_function_decoder_v0(device: torch.device | str = "cpu"):
     with torch.device(device):
         model = FunctionTokenDecoder().eval()
     state_dict = torch.load(
-        data_root("esm3") / "data/weights/esm3_function_decoder_v0.pth",
+        WEIGHTS_DIR / "esm3_function_decoder_v0.pth",
         map_location=device,
     )
     model.load_state_dict(state_dict)
@@ -126,7 +129,7 @@ def ESM3_sm_open_local(device: torch.device | str = "cpu"):
             tokenizers=get_esm3_model_tokenizers(ESM3_OPEN_SMALL),
         ).eval()
     state_dict = torch.load(
-        Path(__file__).resolve().parent / "data/weights/esm3_sm_open_v1_local.pth",
+        WEIGHTS_DIR / "esm3_sm_open_v1_local.pth",
         map_location=device,
     )
     model.load_state_dict(state_dict)
