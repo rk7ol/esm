@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Callable
 
 import torch
@@ -12,6 +13,7 @@ from esm.utils.constants.esm3 import data_root
 from esm.utils.constants.models import (
     ESM3_FUNCTION_DECODER_V0,
     ESM3_OPEN_SMALL,
+    ESM3_OPEN_SMALL_LOCAL,
     ESM3_STRUCTURE_DECODER_V0,
     ESM3_STRUCTURE_ENCODER_V0,
     ESMC_300M,
@@ -111,8 +113,29 @@ def ESM3_sm_open_v0(device: torch.device | str = "cpu"):
     return model
 
 
+def ESM3_sm_open_local(device: torch.device | str = "cpu"):
+    with torch.device(device):
+        model = ESM3(
+            d_model=1536,
+            n_heads=24,
+            v_heads=256,
+            n_layers=48,
+            structure_encoder_fn=ESM3_structure_encoder_v0,
+            structure_decoder_fn=ESM3_structure_decoder_v0,
+            function_decoder_fn=ESM3_function_decoder_v0,
+            tokenizers=get_esm3_model_tokenizers(ESM3_OPEN_SMALL),
+        ).eval()
+    state_dict = torch.load(
+        Path(__file__).resolve().parent / "data/weights/esm3_sm_open_v1_local.pth",
+        map_location=device,
+    )
+    model.load_state_dict(state_dict)
+    return model
+
+
 LOCAL_MODEL_REGISTRY: dict[str, ModelBuilder] = {
     ESM3_OPEN_SMALL: ESM3_sm_open_v0,
+    ESM3_OPEN_SMALL_LOCAL: ESM3_sm_open_local,
     ESM3_STRUCTURE_ENCODER_V0: ESM3_structure_encoder_v0,
     ESM3_STRUCTURE_DECODER_V0: ESM3_structure_decoder_v0,
     ESM3_FUNCTION_DECODER_V0: ESM3_function_decoder_v0,
