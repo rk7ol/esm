@@ -26,6 +26,13 @@ ModelBuilder = Callable[[torch.device | str], nn.Module]
 WEIGHTS_DIR = Path(__file__).resolve().parent / "data/weights"
 
 
+def set_local_weights_dir(weights_dir: Path | str) -> None:
+    """Set the directory used to load local model weights."""
+
+    global WEIGHTS_DIR
+    WEIGHTS_DIR = Path(weights_dir).expanduser().resolve()
+
+
 def ESM3_structure_encoder_v0(device: torch.device | str = "cpu"):
     with torch.device(device):
         model = StructureTokenEncoder(
